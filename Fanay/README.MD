@@ -1,0 +1,2 @@
+# Fanay
+Fanay是一个多agent框架，结合了以一种新的prompt方式与LLM进行更稳定地交互。

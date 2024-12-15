@@ -1,0 +1,49 @@
+## Feature
+
+I need to create an automated file organization system using a Large Language Model (LLM). The goal is to classify files into appropriate categories, create folders for each category, and move the files into the respective folders based on their classification. Below are the detailed requirements:
+
+- File Classification: The system should automatically analyze and classify files based on their content, file type (e.g., documents, spreadsheets, images), or other relevant attributes. The classification should be flexible and accurate, allowing files to be grouped into meaningful categories.
+
+- Input Directory: The system should accept a variable input directory path, which specifies the location of the files to be organized. This input directory should be a variable.
+
+- Output Directory: The system should accept a variable output directory path, which specifies the location where the organized files will be moved. This output directory should be a variable.
+
+- Classification Rules: The classification rules can be a variable. If i do not set the classification, you have to analyze the file and decide the best classification. Define a set of rules or criteria for classifying files. These rules can be based on file extensions, metadata, or other attributes. The system should be able to apply these rules to classify files accurately.
+
+- Folder Creation: Once files are classified, the system should automatically create a folder for each category. The folder names should clearly reflect the category's characteristics.
+
+- File Organization: After categorization, all files should be moved into their corresponding folders. Ensure that files are placed in the correct folders without duplicates or misplacements.
+
+- Scalability and Customization: The system should be scalable and adaptable, allowing for the addition of new classification rules or modifications to existing ones as needed.
+
+- Output Report: Provide a summary report after the organization process, detailing the number of files in each category, examples of files in each category, and any errors or uncertainties in classification.
+
+- Execution and Implementation: Please outline the steps, methods, or algorithms to achieve the above tasks, including any code snippets or technical specifications needed for implementation.
+
+
+## models
+You can use llama3-8b-8192 by groq.
+Here is a example: 
+```
+import os
+
+from groq import Groq
+
+client = Groq(
+    api_key="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"
+)
+
+
+chat_completion = client.chat.completions.create(
+    messages=[
+        {
+            "role": "user",
+            "content": "Explain the importance of fast language models",
+        }
+    ],
+    model="llama3-8b-8192",
+)
+
+print(chat_completion.choices[0].message.content)
+```
+You have to put the api key in a .env file, and load it in the code.
