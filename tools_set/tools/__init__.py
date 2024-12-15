@@ -3,8 +3,12 @@ from .wechatmp_spider import wechatmp_spider
 from .save_to_local import save_to_local
 from .paper_with_code import paper_with_code_search
 from .send_email import send_email
-
+from .youtube_caption import get_youtube_caption
 other_tools = {
+    "get_youtube_caption":{
+        "object":get_youtube_caption,
+        "describe":"提取yuotube视频的字幕，需要参数{'video_url':待提取的视频链接}",
+    },
     "wechatmp_spider":{
         "object":wechatmp_spider,
         "describe":"微信公众号内容搜索器，需要参数{'keyword':搜索的关键词, 'nums':搜索文章数目}",
