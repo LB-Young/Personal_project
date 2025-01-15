@@ -126,16 +126,38 @@ class WeixinCrawler:
         finally:
             self.driver.quit()
 
-async def wechatmp_spider(keyword="", nums=3, params_format=False):
-    if params_format:
-        return ['keywords', 'nums']
-    all_path = []
-    output_dir = r'F:\logs\orca\output\wechatmp'
-    crawler = WeixinCrawler(output_dir, nums)
-    crawler.run(keyword)
-    res_dir = os.path.join(output_dir, keyword)
-    all_path.append(res_dir)
-    return all_path
+
+class WechatSpider:
+    name = "arxiv_search" 
+    description = "搜索微信公众号上相关主题的文章"
+    inputs = {
+        "keyword": {
+            "type": "string",
+            "description": "搜索的关键词"
+            },
+        "nums": {
+            "type": "int",
+            "description": "搜索的文章数量，最多10篇"
+            }
+    }
+    outputs = {
+        "papers": {
+            "type": "list",
+            "description": "搜索到的文章列表"
+            }
+    }
+    props = {}
+
+    async def run(keyword="", nums=3, params_format=False):
+        if params_format:
+            return ['keywords', 'nums']
+        all_path = []
+        output_dir = r'F:\logs\orca\output\wechatmp'
+        crawler = WeixinCrawler(output_dir, nums)
+        crawler.run(keyword)
+        res_dir = os.path.join(output_dir, keyword)
+        all_path.append(res_dir)
+        return all_path
 
 async def wechatmp_spider_keywords(keywords="", nums=3, params_format=False):
     if params_format:

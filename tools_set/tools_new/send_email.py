@@ -14,70 +14,95 @@ async def dict_to_multiline_string(d, indent=0):
             result += " " * indent + f"{key}: {value}\n"
     return result
 
-async def send_email(content="", subject="", to="", params_format=False):
-    if params_format:
-        return ['content', 'subject', 'to']
-    # Set up the SMTP server
-    smtp_server = "smtp.qq.com"
-    smtp_port = 465  # 修改为SSL端口465
-    smtp_username = "823707202@qq.com"
-    # 需要使用应用专用密码而不是普通密码
-    # 请在Google账户设置中生成应用专用密码: https://myaccount.google.com/security
-    smtp_password = load_local_api_keys("qq_mail_shouquanma") # 替换为应用专用密码
-    # Create the email message
-    msg = MIMEMultipart()
-    msg['From'] = smtp_username
-    msg['To'] = ""
-    msg['Subject'] = subject
-    if isinstance(content, dict):
-        content = await dict_to_multiline_string(content, 0)
-    elif isinstance(content, list):
-        content = "[" + "\n".join(content) + "\n]" 
-    else:
-        content = str(content)
+class SendEmail:
+    name = "send_email" 
+    description = "将内容通过邮件发送给指定的邮箱。"
+    inputs = {
+        "content": {
+            "type": "string",
+            "description": "邮件内容"
+            },
+        "subject": {
+            "type": "string",
+            "description": "邮件主题"
+            },
+        "to": {
+            "type": "string",
+            "description": "邮件发送给谁"
+            }
+    }
+    outputs = {
+        "content": {
+            "type": "string",
+            "description": "邮件发送是否成功的提醒"
+            }
+    }
+    props = {}
 
-    # 创建纯文本版本（作为后备）
-    text_part = MIMEText(content, 'plain', 'utf-8')
-    
-    # 转换 Markdown 为 HTML 并创建 HTML 版本
-    html_content = markdown2.markdown(content, extras=['tables', 'code-friendly', 'fenced-code-blocks'])
+    async def run(content="", subject="", to="", params_format=False):
+        if params_format:
+            return ['content', 'subject', 'to']
+        # Set up the SMTP server
+        smtp_server = "smtp.qq.com"
+        smtp_port = 465  # 修改为SSL端口465
+        smtp_username = "823707202@qq.com"
+        # 需要使用应用专用密码而不是普通密码
+        # 请在Google账户设置中生成应用专用密码: https://myaccount.google.com/security
+        smtp_password = load_local_api_keys("qq_mail_shouquanma") # 替换为应用专用密码
+        # Create the email message
+        msg = MIMEMultipart()
+        msg['From'] = smtp_username
+        msg['To'] = ""
+        msg['Subject'] = subject
+        if isinstance(content, dict):
+            content = await dict_to_multiline_string(content, 0)
+        elif isinstance(content, list):
+            content = "[" + "\n".join(content) + "\n]" 
+        else:
+            content = str(content)
+
+        # 创建纯文本版本（作为后备）
+        text_part = MIMEText(content, 'plain', 'utf-8')
+        
+        # 转换 Markdown 为 HTML 并创建 HTML 版本
+        html_content = markdown2.markdown(content, extras=['tables', 'code-friendly', 'fenced-code-blocks'])
     
     # 添加一些基本的 CSS 样式
-    styled_html = f"""
-    <html>
-        <head>
-            <style>
-                body {{ font-family: Arial, sans-serif; line-height: 1.6; }}
-                code {{ background: #f4f4f4; padding: 2px 4px; border-radius: 4px; }}
-                pre {{ background: #f4f4f4; padding: 1em; border-radius: 4px; overflow-x: auto; }}
-                table {{ border-collapse: collapse; width: 100%; }}
-                th, td {{ border: 1px solid #ddd; padding: 8px; }}
-                th {{ background-color: #f4f4f4; }}
-            </style>
-        </head>
-        <body>
-            {html_content}
-        </body>
-    </html>
-    """
-    html_part = MIMEText(styled_html, 'html', 'utf-8')
+        styled_html = f"""
+        <html>
+            <head>
+                <style>
+                    body {{ font-family: Arial, sans-serif; line-height: 1.6; }}
+                    code {{ background: #f4f4f4; padding: 2px 4px; border-radius: 4px; }}
+                    pre {{ background: #f4f4f4; padding: 1em; border-radius: 4px; overflow-x: auto; }}
+                    table {{ border-collapse: collapse; width: 100%; }}
+                    th, td {{ border: 1px solid #ddd; padding: 8px; }}
+                    th {{ background-color: #f4f4f4; }}
+                </style>
+            </head>
+            <body>
+                {html_content}
+            </body>
+        </html>
+        """
+        html_part = MIMEText(styled_html, 'html', 'utf-8')
 
-    msg.attach(html_part)
+        msg.attach(html_part)
 
 
-    # msg.attach(MIMEText(content, 'html', 'utf-8'))
-    try:
-        # 连接 SMTP 服务器
-        server = smtplib.SMTP_SSL(smtp_server, smtp_port)  # 使用 SSL 加密
-        server.login(smtp_username, smtp_password)  # 登录邮箱
-        server.sendmail(from_addr=smtp_username, to_addrs="lby15356@gmail.com", msg=msg.as_string())  # 发送邮件
-        print("邮件发送成功！")
-        return f"Send email to {to} successfully"
-    except smtplib.SMTPException as e:
-        print(f"邮件发送失败：{e}")
-        return "failed"
-    finally:
-        server.quit()
+        # msg.attach(MIMEText(content, 'html', 'utf-8'))
+        try:
+            # 连接 SMTP 服务器
+            server = smtplib.SMTP_SSL(smtp_server, smtp_port)  # 使用 SSL 加密
+            server.login(smtp_username, smtp_password)  # 登录邮箱
+            server.sendmail(from_addr=smtp_username, to_addrs="lby15356@gmail.com", msg=msg.as_string())  # 发送邮件
+            print("邮件发送成功！")
+            return f"Send email to {to} successfully"
+        except smtplib.SMTPException as e:
+            print(f"邮件发送失败：{e}")
+            return "failed"
+        finally:
+            server.quit()
 
 if __name__ == '__main__':
     import asyncio

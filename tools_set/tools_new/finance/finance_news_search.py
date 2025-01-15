@@ -18,18 +18,30 @@ from .cs import cs_news
 from .stcn import stcn_news
 from .finance_sina import finance_sina_news
 
+class FinanceNewsSearch:
+    name = "finance_news_search"
+    description = "搜索财经新闻"
+    inputs = {
+        "nums": {
+            "type": "int",
+            "description": "搜索新闻条数，默认50条"
+            }
+    }
+    outputs = {
+        "all_news": {
+            "type": "list",
+            "description": "搜索到的财经新闻列表"
+            }
+    }
+    props = {}
 
-async def finance_news_search(nums=50, params_format=False):
-    if params_format:
-        return ["nums"]
-    else:
-        all_news = []
-        all_news.extend(await cs_news())
-        if len(all_news) >= nums:
-            return all_news[:nums]
-        all_news.extend(await stcn_news())
-        if len(all_news) >= nums:
-            return all_news[:nums]
-        all_news.extend(await finance_sina_news())
-        return all_news[:nums]
+    async def finance_news_search(nums=50, params_format=False):
+        if params_format:
+            return ["nums"]
+        else:
+            all_news = []
+            all_news.extend(await cs_news())
+            all_news.extend(await stcn_news())
+            all_news.extend(await finance_sina_news())
+            return all_news
     

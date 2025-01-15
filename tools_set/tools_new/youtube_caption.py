@@ -36,11 +36,28 @@ async def translate_captions(url):
         print(f"发生错误: {str(e)}")
         return None
 
-async def get_youtube_caption(video_url='', params_format=False):
-    if params_format:
-        return ['video_url']
-    content = await translate_captions(video_url)
-    return content
+class GetYoutubeCaption:
+    name = "get_youtube_caption"
+    description = "获取youtube视频链接的字幕"
+    inputs = {
+        "video_url": {
+            "type": "string",
+            "description": "视频链接"
+            }
+    }
+    outputs = {
+        "content": {
+            "type": "string",
+            "description": "视频字幕"
+            }
+    }
+    props = {}
+
+    async def run(video_url='', params_format=False):
+        if params_format:
+            return ['video_url']
+        content = await translate_captions(video_url)
+        return content
 
 async def main():
     # 示例用法
