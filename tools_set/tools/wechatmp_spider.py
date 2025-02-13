@@ -129,8 +129,11 @@ class WeixinCrawler:
 async def wechatmp_spider(keyword="", nums=3, params_format=False):
     if params_format:
         return ['keywords', 'nums']
+    
+    # return [f'/Users/liubaoyang/Documents/YoungL/logs/orca/output/wechatmp/{keyword}']
+
     all_path = []
-    output_dir = r'F:\logs\orca\output\wechatmp'
+    output_dir = '/Users/liubaoyang/Documents/YoungL/logs/orca/output/wechatmp'
     crawler = WeixinCrawler(output_dir, nums)
     crawler.run(keyword)
     res_dir = os.path.join(output_dir, keyword)
@@ -141,7 +144,7 @@ async def wechatmp_spider_keywords(keywords="", nums=3, params_format=False):
     if params_format:
         return ['keywords', 'nums']
     all_path = []
-    output_dir = r'F:\logs\orca\output\wechatmp'
+    output_dir = '/Users/liubaoyang/Documents/YoungL/logs/orca/output/wechatmp'
     crawler = WeixinCrawler(output_dir, nums)
     for keyword in keywords:
         crawler.run(keyword)
@@ -154,7 +157,7 @@ def ut(keywords=[], nums=3, params_format=False):
     if params_format:
         return ['keywords']
     all_path = []
-    output_dir = r'F:\logs\orca\output\wechatmp'
+    output_dir = '/Users/liubaoyang/Documents/YoungL/logs/orca/output/wechatmp'
     for keyword in keywords:
         crawler = WeixinCrawler(output_dir, nums)
         crawler.run(keyword)
@@ -165,7 +168,7 @@ def ut(keywords=[], nums=3, params_format=False):
 
 
 if __name__ == '__main__':
-    res = ut(keywords=['openai'], nums=3, params_format=False)
+    res = ut(keywords=['deepseek'], nums=3, params_format=False)
     print(res)
 
 

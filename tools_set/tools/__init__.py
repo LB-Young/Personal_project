@@ -8,7 +8,12 @@ from .finance.finance_news_search import finance_news_search
 from .arxiv_search import arxiv_search
 from .list_to_multiline_string import list_to_multiline_string
 from .retrival_from_database import retrive_from_database
-
+from .vl_model import vl_model
+from .extract_tables_images_from_images import extract_tables_images_from_images
+from .images_layout_analysis import images_layout_analysis
+from .pdf2picture import pdf2pictures
+from .flow_chart import flow_chart
+from .mermaid_add_picture import mermaid_add_picture
 
 other_tools = {
     "retrive_from_database":{
@@ -50,6 +55,31 @@ other_tools = {
     "send_email": {
         "object":send_email,
         "describe":"发送邮件，需要参数{'subject':邮件主题，'content':邮件内容，'to':收件人邮箱地址}",
+    },
+    # 新增的四个工具
+    "vl_model": {
+        "object": vl_model,
+        "describe": "提取图片中的文字内容，需要参数{'pic_path':图片路径}"
+    },
+    "extract_tables_images_from_images": {
+        "object": extract_tables_images_from_images,
+        "describe": "从图片中提取表格和图片，需要参数{'images_dir':图片目录, 'tables_images_outdir':输出目录}"
+    },
+    "images_layout_analysis": {
+        "object": images_layout_analysis,
+        "describe": "分析图片布局，需要参数{'images_dir':图片目录, 'layout_save_dir':布局保存目录}"
+    },
+    "pdf2pictures": {
+        "object": pdf2pictures,
+        "describe": "将PDF转换为图片，需要参数{'pdf_path':PDF文件路径, 'picture_save_path':图片保存路径}"
+    },
+    "flow_chart": {
+        "object": flow_chart,
+        "describe": "生成流程图，需要参数{'mermaid_string':mermaid字符串, 'output_path':输出路径}"
+    },
+    "mermaid_add_picture": {
+        "object": mermaid_add_picture,
+        "describe": "在mermaid流程图中添加图片，需要参数{'mermaid_string':mermaid字符串, 'pic_path':图片路径}"
     }
 }
 
