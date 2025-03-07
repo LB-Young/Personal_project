@@ -7,6 +7,8 @@ from .youtube_caption import get_youtube_caption
 from .finance.finance_news_search import finance_news_search
 from .arxiv_search import arxiv_search
 from .list_to_multiline_string import list_to_multiline_string
+from .dict_to_multiline_string import dict_to_multiline_string
+from .web_search_zhipu import web_search_zhipu
 from .retrival_from_database import retrive_from_database
 from .vl_model import vl_model
 from .extract_tables_images_from_images import extract_tables_images_from_images
@@ -14,8 +16,27 @@ from .images_layout_analysis import images_layout_analysis
 from .pdf2picture import pdf2pictures
 from .flow_chart import flow_chart
 from .mermaid_add_picture import mermaid_add_picture
+from .duckduckgo_websearch import duckduckgo_websearch
+from .jina_read_urls import jina_read_urls
+from .jina_search import jina_search
 
 other_tools = {
+    "jina_read_urls": {
+        "object": jina_read_urls,
+        "describe": "使用Jina Reader API获取网页内容，需要参数{'urls': 待读取的URL列表}"
+    },
+    "jina_search": {
+        "object": jina_search,
+        "describe": "使用Jina Search API进行搜索，需要参数{'query': 搜索关键词}"
+    },
+    "web_search_zhipu": {
+        "object": web_search_zhipu,
+        "describe": "使用智谱AI搜索引擎进行网页搜索，需要参数{'keyword': 搜索关键词}"
+    },
+    "duckduckgo_websearch": {
+        "object": duckduckgo_websearch,
+        "describe": "使用DuckDuckGo搜索引擎进行网页搜索，需要参数{'query': 搜索关键词, 'num_results': 搜索结果数量}"
+    },
     "retrive_from_database":{
         "object":retrive_from_database,
         "describe":"从数据库中检索数据，需要参数{'query':查询语句}",
@@ -23,6 +44,10 @@ other_tools = {
     "list_to_multiline_string":{
         "object":list_to_multiline_string,
         "describe":"把list转换为多行的字符串，需要参数{'list_data':待转换的list数据}",
+    },
+    "dict_to_multiline_string":{
+        "object":dict_to_multiline_string,
+        "describe":"把dict转换为多行的字符串，需要参数{'dict_data':待转换的dict数据}",
     },
     "arxiv_search":{
         "object":arxiv_search,
@@ -54,7 +79,7 @@ other_tools = {
     },
     "send_email": {
         "object":send_email,
-        "describe":"发送邮件，需要参数{'subject':邮件主题，'content':邮件内容，'to':收件人邮箱地址}",
+        "describe":"发送邮件，需要参数{'subject':邮件主题，'content':邮件内容，'to':收件人邮箱地址列表}",
     },
     # 新增的四个工具
     "vl_model": {

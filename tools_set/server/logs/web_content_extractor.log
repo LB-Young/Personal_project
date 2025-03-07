@@ -1,0 +1,5 @@
+2025-03-03 11:05:59,381 - web_content_extractor - INFO - 开始提取2个URL的内容
+2025-03-03 11:05:59,381 - web_content_extractor - INFO - 正在处理URL: https://jina.ai/reader
+2025-03-03 11:06:02,710 - web_content_extractor - INFO - 成功提取URL内容: https://jina.ai/reader
+2025-03-03 11:06:02,711 - web_content_extractor - INFO - 正在处理URL: https://example.com
+2025-03-03 11:06:03,126 - web_content_extractor - INFO - 成功提取URL内容: https://example.com

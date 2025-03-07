@@ -16,7 +16,7 @@ async def arxiv_search(keyword="", nums=1, params_format=False):
   papers = []
   for r in client.results(search):
     try:
-      down_load_path = r.download_pdf("F:/logs/orca/download_pdf/")
+      down_load_path = r.download_pdf("/Users/liubaoyang/Documents/YoungL/logs/orca/output/paper_recommend/download_pdf/")
       pdf_text = await read_pdf(down_load_path)
       papers.append(
         {
@@ -30,16 +30,16 @@ async def arxiv_search(keyword="", nums=1, params_format=False):
       )
     except Exception as e:
       print(e)
-      papers.append(
-        {
-          "title": r.title,
-          "authors": r.authors,
-          "published": r.published,
-          "summary": r.summary,
-          "pdf_text": r.summary,
-          "down_load_path": down_load_path
-        }
-      )
+      # papers.append(
+      #   {
+      #     "title": r.title,
+      #     "authors": r.authors,
+      #     "published": r.published,
+      #     "summary": r.summary,
+      #     "pdf_text": r.summary,
+      #     "down_load_path": down_load_path
+      #   }
+      # )
   return papers
 
 

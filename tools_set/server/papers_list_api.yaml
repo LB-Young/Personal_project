@@ -1,0 +1,104 @@
+openapi: 3.0.0
+info:
+  title: Papers List API
+  description: 获取论文列表的API接口
+  version: 1.0.0
+
+servers:
+  - url: http://106.15.129.192:3389
+    description: 本地开发服务器
+
+paths:
+  /papers/list:
+    post:
+      summary: 获取论文列表
+      description: 根据指定数量获取最新的论文信息
+      operationId: getPapers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nums:
+                  type: integer
+                  description: 需要获取的论文数量
+              required:
+                - nums
+            example:
+              nums: 5
+      responses:
+        '200':
+          description: 成功获取论文列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  answer:
+                    type: object
+                    properties:
+                      answer:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            title:
+                              type: string
+                              description: 论文标题
+                            url:
+                              type: string
+                              description: 论文链接
+                            team:
+                              type: string
+                              description: 研究团队
+                            abstract:
+                              type: string
+                              description: 论文摘要
+                            published_date:
+                              type: string
+                              description: 发布日期
+                            stars:
+                              type: integer
+                              description: 获得的星标数
+                            authors:
+                              type: array
+                              items:
+                                type: string
+                              description: 作者列表
+                            content:
+                              type: string
+                              description: 论文内容
+                          required:
+                            - title
+                            - url
+                            - team
+                            - abstract
+                            - published_date
+                            - stars
+                            - authors
+                            - content
+              example:
+                answer:
+                  answer:
+                    - title: "示例论文标题"
+                      url: "https://example.com/paper"
+                      team: "研究团队名称"
+                      abstract: "这是一个示例论文摘要"
+                      published_date: "2024-01-01"
+                      stars: 100
+                      authors: ["作者1", "作者2"]
+                      content: "论文详细内容"
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    description: 错误详情
+              example:
+                detail: "Internal server error"

@@ -1,0 +1,71 @@
+openapi: 3.0.0
+info:
+  title: Send Email API
+  description: 发送邮件的API接口
+  version: 1.0.0
+
+servers:
+  - url: http://106.15.129.192:3389
+    description: 本地开发服务器
+
+paths:
+  /send_email:
+    post:
+      summary: 发送邮件
+      description: 发送指定内容的邮件到指定收件人
+      operationId: sendEmail
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subject:
+                  type: string
+                  description: 邮件主题
+                content:
+                  type: string
+                  description: 邮件内容
+                to:
+                  type: array
+                  items:
+                    type: string
+                  description: 收件人邮箱地址列表
+              required:
+                - subject
+                - content
+                - to
+            example:
+              subject: "测试邮件"
+              content: "这是一封测试邮件的内容"
+              to: ["recipient1@example.com", "recipient2@example.com"]
+      responses:
+        '200':
+          description: 邮件发送成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  answer:
+                    type: object
+                    properties:
+                      answer:
+                        type: string
+                        description: 发送结果信息
+              example:
+                answer:
+                  answer: "邮件发送成功"
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    description: 错误详情
+              example:
+                detail: "Failed to send email"

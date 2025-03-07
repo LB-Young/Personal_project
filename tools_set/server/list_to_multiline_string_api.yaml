@@ -1,0 +1,61 @@
+openapi: 3.0.0
+info:
+  title: List to Multiline String API
+  description: 将字符串列表转换为多行字符串的API接口
+  version: 1.0.0
+
+servers:
+  - url: http://106.15.129.192:3389
+    description: 本地开发服务器
+
+paths:
+  /list_to_multiline_string:
+    post:
+      summary: 转换列表为多行字符串
+      description: 将字符串列表转换为多行字符串格式
+      operationId: listToMultilineString
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                list_content:
+                  type: array
+                  items:
+                    type: string
+                  description: 需要转换的字符串列表
+              required:
+                - list_content
+            example:
+              list_content: ["第一行", "第二行", "第三行"]
+      responses:
+        '200':
+          description: 转换成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  answer:
+                    type: object
+                    properties:
+                      answer:
+                        type: string
+                        description: 转换后的多行字符串
+              example:
+                answer:
+                  answer: "第一行\n第二行\n第三行"
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    description: 错误详情
+              example:
+                detail: "Failed to convert list to multiline string"

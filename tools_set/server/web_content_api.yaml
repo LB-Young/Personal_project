@@ -1,0 +1,91 @@
+openapi: 3.0.0
+info:
+  title: Web Content Extractor API
+  description: 使用Jina Reader API从多个URL中提取网页内容的服务
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+
+servers:
+  - url: http://106.15.129.192:3389
+    description: 本地开发服务器
+
+paths:
+  /web_content:
+    post:
+      summary: 提取网页内容
+      description: |
+        从提供的URL列表中提取网页内容。
+        使用Jina Reader API将网页内容转换为干净的、适合LLM处理的文本格式。
+      operationId: extractWebContent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebContentRequest'
+      responses:
+        '200':
+          description: 成功提取网页内容
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseModel'
+        '400':
+          description: 无效的请求参数
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    WebContentRequest:
+      type: object
+      required:
+        - urls
+      properties:
+        urls:
+          type: array
+          description: 要提取内容的URL列表
+          items:
+            type: string
+            format: uri
+          example: ["https://example.com", "https://jina.ai"]
+    
+    ResponseModel:
+      type: object
+      properties:
+        answer:
+          type: object
+          properties:
+            answer:
+              type: object
+              additionalProperties:
+                type: string
+              description: 包含URL和对应内容的字典
+              example:
+                "https://example.com": "这是示例网站的内容..."
+                "https://jina.ai": "这是Jina AI网站的内容..."
+    
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: 错误详情
+          example: "获取网页内容时发生错误"
+
+tags:
+  - name: Web Content
+    description: 网页内容提取相关操作
+
+security:
+  - {}  # 无需认证

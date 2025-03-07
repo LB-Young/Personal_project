@@ -1,0 +1,158 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Tool Box Example",
+        "description": "This is a tool box json content example",
+        "version": "1.0.11"
+    },
+    "servers": [
+        {
+            "url": "https://animale.ncyclopedia.io"
+        }
+    ],
+    "paths": {
+        "/animals": {
+            "post": {
+                "summary": "AddAnimalInfo",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AnimalInfo"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AnimalID"
+                                }
+                            }
+                        },
+                        "description": "Return animal id"
+                    }
+                }
+            }
+        },
+        "/animals/{animal_id}": {
+            "get": {
+                "summary": "GetAnimalInfo",
+                "parameters": [
+                    {
+                        "name": "animal_id",
+                        "in": "path",
+                        "description": "Animal id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AnimalInfo"
+                                }
+                            }
+                        },
+                        "description": "Return animal id"
+                    }
+                }
+            }
+        },
+        "/animals/list": {
+            "get": {
+                "summary": "GetAnimalInfList",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "description": "Number of pages",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AnimalInfoList"
+                                }
+                            }
+                        },
+                        "description": "Return animal id"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "AnimalInfo": {
+                "type": "object",
+                "properties": {
+                    "age": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "classify": {
+                        "type": "string"
+                    },
+                    "length": {
+                        "type": "integer"
+                    },
+                    "height": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "age",
+                    "name",
+                    "classify"
+                ]
+            },
+            "AnimalID": {
+                "type": "object",
+                "properties": {
+                    "res": {
+                        "type": "string"
+                    }
+                }
+            },
+            "AnimalInfoList": {
+                "type": "object",
+                "properties": {
+                    "res": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AnimalInfo"
+                        }
+                    }
+                },
+                "required": [
+                    "res"
+                ]
+            }
+        }
+    }
+}

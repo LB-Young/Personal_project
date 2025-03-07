@@ -25,17 +25,14 @@ async def send_email(content="", subject="", to="", params_format=False):
     # 请在Google账户设置中生成应用专用密码: https://myaccount.google.com/security
     smtp_password = load_local_api_keys("qq_mail_shouquanma") # 替换为应用专用密码
     # Create the email message
-    msg = MIMEMultipart()
-    msg['From'] = smtp_username
-    msg['To'] = ""
-    msg['Subject'] = subject
+    
     if isinstance(content, dict):
         content = await dict_to_multiline_string(content, 0)
     elif isinstance(content, list):
         content = "[" + "\n".join(content) + "\n]" 
     else:
-        content = str(content)
-
+        content = str(content).replace('\\n', '\n').replace("\n", "\n\n").replace("\n\n\n\n", "\n\n")
+    
     # 创建纯文本版本（作为后备）
     text_part = MIMEText(content, 'plain', 'utf-8')
     
@@ -61,141 +58,42 @@ async def send_email(content="", subject="", to="", params_format=False):
     </html>
     """
     html_part = MIMEText(styled_html, 'html', 'utf-8')
+    
+    if isinstance(to, str):
+        to_list = [to]
+    elif isinstance(to, list):
+        to_list = to
+    else:
+        raise ValueError("to must be a string or a list of strings")
+    success_list = []
+    fail_list = []
+    for to in to_list:
+        try:
+            msg = MIMEMultipart()
+            msg['From'] = smtp_username
+            msg['To'] = ""
+            msg['Subject'] = subject
+            msg.attach(html_part)
 
-    msg.attach(html_part)
-
-
-    # msg.attach(MIMEText(content, 'html', 'utf-8'))
-    try:
-        # 连接 SMTP 服务器
-        server = smtplib.SMTP_SSL(smtp_server, smtp_port)  # 使用 SSL 加密
-        server.login(smtp_username, smtp_password)  # 登录邮箱
-        server.sendmail(from_addr=smtp_username, to_addrs="lby15356@gmail.com", msg=msg.as_string())  # 发送邮件
-        print("邮件发送成功！")
-        return f"Send email to {to} successfully"
-    except smtplib.SMTPException as e:
-        print(f"邮件发送失败：{e}")
-        return "failed"
-    finally:
-        server.quit()
+        # msg.attach(MIMEText(content, 'html', 'utf-8'))
+        
+            # 连接 SMTP 服务器
+            server = smtplib.SMTP_SSL(smtp_server, smtp_port)  # 使用 SSL 加密
+            server.login(smtp_username, smtp_password)  # 登录邮箱
+            server.sendmail(from_addr=smtp_username, to_addrs=to, msg=msg.as_string())  # 发送邮件
+            print("邮件发送成功！")
+            success_list.append(to)
+        except smtplib.SMTPException as e:
+            print(f"邮件发送失败：{e}")
+            fail_list.append(to)
+            
+    server.quit()
+    return f"Send email to {success_list} successfully, fail to {fail_list}"
+    
 
 if __name__ == '__main__':
     import asyncio
-    content = """
-    # AutoTrust: Benchmarking Trustworthiness in Large Vision Language Models for Autonomous Driving
-https://arxiv.org/abs/2412.15206
-### 基本信息
-作者: Shuo Xing, Hongyuan Hua, Xiangbo Gao, Shenzhe Zhu, Renjie Li, Kexin Tian, Xiaopeng Li, Heng Huang, Tianbao Yang, Zhangyang Wang, Yang Zhou, Huaxiu Yao, Zhengzhong Tu
-研究团队: Texas A&M University, University of Toronto, University of Michigan, University of Wisconsin-Madison, University of Maryland, University of Texas at Austin, University of North Carolina at Chapel Hill
-### 论文解读
-#### 摘要
-近年来，针对自动驾驶（AD）的大型视觉语言模型（VLMs）在场景理解和推理方面表现出色，使其成为端到端驾驶系统的候选者。然而，关于DriveVLMs的信任度研究有限，这直接影响了公共交通安全。本文介绍了AutoTrust，一个用于评估自动驾驶中大型视觉语言模型信任度的综合基准，涵
-盖了信任度、安全性、鲁棒性、隐私和公平性等多个方面。我们构建了最大的视觉问答数据集，用于研究驾驶场景中的信任问题，包含超过10k个 
-独特场景和18k个查询。我们评估了六个公开可用的VLMs，从通用模型到专业模型，从开源模型到商业模型。我们的全面评估揭示了DriveVLMs在信
-任度威胁方面的先前未发现的漏洞。具体来说，我们发现通用VLMs如LLaVA-v1.6和GPT-4o-mini在整体信任度上出人意料地优于专门为驾驶优化的 
-模型。DriveVLMs如DriveLM-Agent特别容易泄露敏感信息。此外，通用和专业VLMs都容易受到对抗性攻击，并且在确保多样环境和人群的无偏决策
-方面表现不佳。我们的研究呼吁立即采取决定性行动来解决DriveVLMs的信任度问题，这对公共安全和依赖自动驾驶交通系统的所有公民的福祉至 
-关重要。我们的基准可在https://github.com/taco-group/AutoTrust 获取，排行榜可在https://taco-group.github.io/AutoTrust/ 查看。    
-#### 研究的问题
-本文研究的核心问题是：如何评估和提升自动驾驶中大型视觉语言模型的信任度，特别是在信任度、安全性、鲁棒性、隐私和公平性等方面。    
-#### 核心思路
-本文的核心思路是引入AutoTrust基准，通过构建大规模的视觉问答数据集，评估六个公开可用的VLMs在不同信任度维度上的表现。研究团队通过 
-实验揭示了现有DriveVLMs在信任度方面的漏洞，并提出了改进建议。
-#### 实验的结果
-实验结果表明：
-1. 通用VLMs在信任度上表现优于专门为驾驶优化的模型。
-2. DriveVLMs在隐私保护方面表现不佳，容易泄露敏感信息。
-3. 通用和专业VLMs都容易受到对抗性攻击，并且在确保无偏决策方面表现不佳。
-4. 研究呼吁立即采取行动解决DriveVLMs的信任度问题，以确保公共安全和自动驾驶系统的可靠性。
-# 提取的论文标题
-Human-Humanoid Robots Cross-Embodiment Behavior-Skill Transfer Using Decomposed Adversarial Learning from Demonstration
-
-提取的论文链接
-https://arxiv.org/abs/2412.15166
-
-### 基本信息
-提取的作者、研究团队
-- 作者: Junjia Liu, Zhuo Li, Minghao Yu, Zhipeng Dong, Sylvain Calinon, Darwin Caldwell, Fei Chen
-- 研究团队:
-  - Department of Mechanical and Automation Engineering, T-Stone Robotics Institute, The Chinese University of Hong Kong        
-  - Idiap Research Institute, Martigny, Switzerland
-  - Department of Advanced Robotics, Istituto Italiano di Tecnologia, Genoa, Italy
-
-### 论文解读
-#### 摘要
-Humanoid robots are envisioned as embodied intelligent agents capable of performing a wide range of human-level loco-manipulation tasks, particularly in scenarios requiring strenuous and repetitive labor. However, learning these skills is challenging due to the high degrees of freedom of humanoid robots, and collecting sufficient training data for humanoid is a laborious process. Given the rapid introduction of new humanoid platforms, a cross-embodiment framework that allows generalizable skill transfer is 
-becoming increasingly critical. To address this, we propose a transferable framework that reduces the data bottleneck by using a unified digital human model as a common prototype and bypassing the need for re-training on every new robot platform. The model learns behavior primitives from human demonstrations through adversarial imitation, and the complex robot structures are decomposed into functional components, each trained independently and dynamically coordinated. Task generalization is achieved through a human-object interaction graph, and skills are transferred to different robots via embodiment-specific kinematic motion retargeting and dynamic fine-tuning. Our framework is validated on five humanoid robots with diverse configurations, demonstrating stable loco-manipulation and highlighting its effectiveness in reducing data requirements and increasing the efficiency of skill transfer across platforms.
-
-#### 研究的问题
-- 人形机器人学习复杂任务（如行走和操作）的挑战，特别是由于其高自由度和数据收集的困难。
-- 不同人形机器人平台之间的技能转移问题，尤其是由于配置差异导致的技能转移效率低下。
-
-#### 核心思路
-- 提出一个跨体现的框架，使用统一的数字人类模型作为通用原型，减少数据瓶颈。
-- 通过对抗性模仿学习从人类演示中学习行为原语。
-- 将复杂的机器人结构分解为功能组件，每个组件独立训练并通过动态协调进行整合。
-- 通过人类-物体交互图实现任务泛化，并通过体现特定的运动重定向和动态微调将技能转移到不同机器人。
-
-#### 实验的结果
-- 在五种不同配置的人形机器人上验证了该框架，展示了稳定的行走和操作能力。
-- 实验结果表明，该框架有效减少了数据需求，并提高了跨平台技能转移的效率。
-- 与现有方法相比，该框架在任务完成率和训练时间上均有显著提升。
-# AutoTrust: Benchmarking Trustworthiness in Large Vision Language Models for Autonomous Driving
-https://arxiv.org/abs/2412.15206
-### 基本信息
-作者: Shuo Xing, Hongyuan Hua, Xiangbo Gao, Shenzhe Zhu, Renjie Li, Kexin Tian, Xiaopeng Li, Heng Huang, Tianbao Yang, Zhangyang Wang, Yang Zhou, Huaxiu Yao, Zhengzhong Tu
-研究团队: Texas A&M University, University of Toronto, University of Michigan, University of Wisconsin-Madison, University of Maryland, University of Texas at Austin, University of North Carolina at Chapel Hill
-### 论文解读
-#### 摘要
-近年来，针对自动驾驶（AD）的大型视觉语言模型（VLMs）在场景理解和推理方面表现出色，使其成为端到端驾驶系统的候选者。然而，关于DriveVLMs的信任度研究有限，这直接影响了公共交通安全。本文介绍了AutoTrust，一个用于评估自动驾驶中大型视觉语言模型信任度的综合基准，涵
-盖了信任度、安全性、鲁棒性、隐私和公平性等多个方面。我们构建了最大的视觉问答数据集，用于研究驾驶场景中的信任问题，包含超过10k个 
-独特场景和18k个查询。我们评估了六个公开可用的VLMs，从通用模型到专业模型，从开源模型到商业模型。我们的全面评估揭示了DriveVLMs在信
-任度威胁方面的先前未发现的漏洞。具体来说，我们发现通用VLMs如LLaVA-v1.6和GPT-4o-mini在整体信任度上出人意料地优于专门为驾驶优化的 
-模型。DriveVLMs如DriveLM-Agent特别容易泄露敏感信息。此外，通用和专业VLMs都容易受到对抗性攻击，并且在确保多样环境和人群的无偏决策
-方面表现不佳。我们的研究呼吁立即采取决定性行动来解决DriveVLMs的信任度问题，这对公共安全和依赖自动驾驶交通系统的所有公民的福祉至 
-关重要。我们的基准可在https://github.com/taco-group/AutoTrust 获取，排行榜可在https://taco-group.github.io/AutoTrust/ 查看。    
-#### 研究的问题
-本文研究的核心问题是：如何评估和提升自动驾驶中大型视觉语言模型的信任度，特别是在信任度、安全性、鲁棒性、隐私和公平性等方面。    
-#### 核心思路
-本文的核心思路是引入AutoTrust基准，通过构建大规模的视觉问答数据集，评估六个公开可用的VLMs在不同信任度维度上的表现。研究团队通过 
-实验揭示了现有DriveVLMs在信任度方面的漏洞，并提出了改进建议。
-#### 实验的结果
-实验结果表明：
-1. 通用VLMs在信任度上表现优于专门为驾驶优化的模型。
-2. DriveVLMs在隐私保护方面表现不佳，容易泄露敏感信息。
-3. 通用和专业VLMs都容易受到对抗性攻击，并且在确保无偏决策方面表现不佳。
-4. 研究呼吁立即采取行动解决DriveVLMs的信任度问题，以确保公共安全和自动驾驶系统的可靠性。
-# 提取的论文标题
-Human-Humanoid Robots Cross-Embodiment Behavior-Skill Transfer Using Decomposed Adversarial Learning from Demonstration
-
-提取的论文链接
-https://arxiv.org/abs/2412.15166
-
-### 基本信息
-提取的作者、研究团队
-- 作者: Junjia Liu, Zhuo Li, Minghao Yu, Zhipeng Dong, Sylvain Calinon, Darwin Caldwell, Fei Chen
-- 研究团队:
-  - Department of Mechanical and Automation Engineering, T-Stone Robotics Institute, The Chinese University of Hong Kong        
-  - Idiap Research Institute, Martigny, Switzerland
-  - Department of Advanced Robotics, Istituto Italiano di Tecnologia, Genoa, Italy
-
-### 论文解读
-#### 摘要
-Humanoid robots are envisioned as embodied intelligent agents capable of performing a wide range of human-level loco-manipulation tasks, particularly in scenarios requiring strenuous and repetitive labor. However, learning these skills is challenging due to the high degrees of freedom of humanoid robots, and collecting sufficient training data for humanoid is a laborious process. Given the rapid introduction of new humanoid platforms, a cross-embodiment framework that allows generalizable skill transfer is 
-becoming increasingly critical. To address this, we propose a transferable framework that reduces the data bottleneck by using a unified digital human model as a common prototype and bypassing the need for re-training on every new robot platform. The model learns behavior primitives from human demonstrations through adversarial imitation, and the complex robot structures are decomposed into functional components, each trained independently and dynamically coordinated. Task generalization is achieved through a human-object interaction graph, and skills are transferred to different robots via embodiment-specific kinematic motion retargeting and dynamic fine-tuning. Our framework is validated on five humanoid robots with diverse configurations, demonstrating stable loco-manipulation and highlighting its effectiveness in reducing data requirements and increasing the efficiency of skill transfer across platforms.
-
-#### 研究的问题
-- 不同人形机器人平台之间的技能转移问题，尤其是由于配置差异导致的技能转移效率低下。
-
-#### 核心思路
-- 通过对抗性模仿学习从人类演示中学习行为原语。
-- 将复杂的机器人结构分解为功能组件，每个组件独立训练并通过动态协调进行整合。
-- 通过人类-物体交互图实现任务泛化，并通过体现特定的运动重定向和动态微调将技能转移到不同机器人。
-
-#### 实验的结果
-- 在五种不同配置的人形机器人上验证了该框架，展示了稳定的行走和操作能力。
-- 实验结果表明，该框架有效减少了数据需求，并提高了跨平台技能转移的效率。
-- 与现有方法相比，该框架在任务完成率和训练时间上均有显著提升。
-"""
-    res = asyncio.run(send_email(content, "1", to="lby15356@gmail.com"))
+    content = 'YoungL！\n我为您收集了最新的论文，并根据您的研究方向给出以下阅读建议：\n\n-----------------------------------------------------------------------------------------------------------------------------\n"{\n    "推荐阅读内容和顺序": [\n        {\n            "类别": "LLM",\n            "star数目": 3,\n            "标题": "The Stochastic Parrot on LLM\'s Shoulder: A Summative Assessment of Physical Concept Understanding",\n            "摘要总结": "研究通过设计物理概念理解任务PhysiCo，揭示了大型语言模型在理解核心物理现象上的局限性。",\n            "论文链接": "https://paperswithcode.com/paper/the-stochastic-parrot-on-llm-s-shoulder-a"\n        },\n        {\n            "类别": "多模态",\n            "star数目": 2,\n            "标题": "Spatio-temporal collaborative multiple-stream transformer network for liver lesion classification on multiple-sequence magnetic resonance imaging",\n            "摘要总结": "提出了一种时空协同多流Transformer网络，显著提升了多序列MRI肝脏病变分类的性能。",\n            "论文链接": "https://paperswithcode.com/paper/spatio-temporal-collaborative-multiple-stream"\n        },\n        {\n            "类别": "多模态",\n            "star数目": 1,\n            "标题": "Redistribute Ensemble Training for Mitigating Memorization in Diffusion Models",\n            "摘要总结": "提出一种减少扩散模型记忆行为的方法，有效降低了隐私风险并保持生成性能。",\n            "论文链接": "https://paperswithcode.com/paper/redistribute-ensemble-training-for-mitigating"\n        }\n    ],\n    "参考论文总结": {\n        "LLM": "LLM领域的论文主要探讨了大型语言模型对物理概念的理解能力。研究表明，尽管先进模型如GPT-4o和Gemini 2.0在自然语言处理任务中表现优异，但在涉及深层次推理的任务中仍存在明显不足，表明其可能存在“随机鹦鹉”现象。《The Stochastic Parrot on LLM\'s Shoulder: A Summative Assessment of Physical Concept Understanding》",\n        "RAG": "未收集到与RAG相关的最新前沿论文。",\n        "Agent": "未收集到与Agent相关的最新前沿论文。",\n        "多模态": "多模态领域的论文集中在医学影像分析和扩散模型优化上。前者提出了基于Transformer的网络用于肝脏病变分类，后者则关注减少扩散模型的记忆行为以保护隐私。两篇论文均展示了创新的技术解决方案，并在实验中取得了显著成果。《Spatio-temporal collaborative multiple-stream transformer network for liver lesion classification on multiple-sequence magnetic resonance imaging》、《Redistribute Ensemble Training for Mitigating Memorization in Diffusion Models》",\n        "音频": "未收集到与音频相关的最新前沿论文。",\n        "计算机视觉": "计算机视觉领域的论文探讨了伪装对象检测和激活函数优化。伪装对象检测的研究提出了一种结合脑机接口的人机协作框架，而激活函数优化则测试了一种新的自定义激活函数TAAF的性能。这些研究为提高模型效率和可靠性提供了新思路。《Evaluating the Performance of TAAF for image classification models》、《Uncertainty Aware Human-machine Collaboration in Camouflaged Object Detection》",\n        "其它": "其他领域的论文涵盖了图神经网络、灾难性遗忘、异常检测和注意力机制优化等主题。研究显示经典GNN在图级别任务中表现出色，Eidetic Learning解决了灾难性遗忘问题，AnomalyGFM提出了一种适用于零样本和少样本场景的图异常检测方法，Top-Theta Attention则优化了Transformer的计算效率。《Unlocking the Potential of Classic GNNs for Graph-level Tasks: Simple Architectures Meet Excellence》、《Eidetic Learning: an Efficient and Provable Solution to Catastrophic Forgetting》、《AnomalyGFM: Graph Foundation Model for Zero/Few-shot Anomaly Detection》、《Top-Theta Attention: Sparsifying Transformers by Compensated Thresholding》"\n    }\n}"'
+    content = content.replace("\n", "\n\n").replace("\n\n\n\n", "\n\n")
+    res = asyncio.run(send_email(content, "1", to=["lby15356@gmail.com", "xyzhang290@gmail.com"]))
     print(res)

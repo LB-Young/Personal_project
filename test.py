@@ -1,31 +1,40 @@
-import time
-import asyncio
-import copy
-async def inner(a):
-    for item in range(a):
-        yield item*2, item+2
-        await asyncio.sleep(1)
+import requests
 
-async def outer(a):
-    result = []
-    async for i, j in inner(a):
-        print(i,j)
-        result.append((i,j))
-    return result
+def get_papers_simple():
+    url = "http://47.94.46.58:3389/papers/list"
+    payload = {"nums": 2}  # 获取5篇论文
+    
+    try:
+        response = requests.post(url, json=payload)
+        breakpoint()
+        data = response.json()
+        breakpoint()
+        # 打印每篇论文的基本信息
+        for paper in data['answer']:
+            print(f"\n论文标题: {paper['title']}")
+            print(f"作者: {', '.join(paper['authors'])}")
+            print(f"URL: {paper['url']}")
+            print("-" * 30)
+            
+    except Exception as e:
+        print(f"发生错误: {e}")
 
-async def outer1():
-    for i in range(3):
-        result = await outer(i)
-        yield i, result
+    url = "http://47.94.46.58:3389/list_to_multiline_string"
+    payload = {
+        "list_content": [paper['title'] for paper in data['answer']]
+    }
+    response = requests.post(url, json=payload)
+    data = response.json()
+    print(data)
 
-async def out2():
-    result = outer1()
-    return result
-
-async def main():
-    result = await out2()
-    async for num,  item in result:
-        for i,j in item:
-            print(num, i, j)
-
-asyncio.run(main())
+    url = "http://47.94.46.58:3389/send_email"
+    payload = {
+        "subject": "daily paper recommend",
+        "content": data['answer'],
+        "to": ['lby15356@gmail.com']
+    }
+    response = requests.post(url, json=payload)
+    data = response.json()
+    print(data)
+if __name__ == "__main__":
+    get_papers_simple()

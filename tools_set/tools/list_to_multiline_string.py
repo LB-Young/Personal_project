@@ -4,7 +4,6 @@ from .dict_to_multiline_string import dict_to_multiline_string
 async def list_to_multiline_string(list_data=[], params_format=False):
   if params_format:
     return ['list_data']
-  
   result = ""
   for item in list_data:
     if isinstance(item, list):
